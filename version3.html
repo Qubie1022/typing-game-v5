@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>英打遊戲版本 3</title>
+<style>
+:root{--bg1:#0b0f1f;--bg2:#05060d;--fg:#e8ecff;--mut:#8f98c9;--line:rgba(255,255,255,.14);--accent:#7c5cff;--accent2:#22d3ee;--ok:#34d399;--bad:#ff6b8a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0%,var(--bg1),var(--bg2) 70%) fixed;color:var(--fg);
+font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+a.back{color:var(--accent2);font-size:.95rem}
+.eyebrow{margin:1.2rem 0 .3rem;font-size:.8rem;letter-spacing:.2em;color:var(--mut)}
+h1{margin:0 0 .8rem;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;letter-spacing:.06em;
+background:linear-gradient(120deg,var(--accent2),var(--accent) 55%,#ff6ec7);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 20px rgba(124,92,255,.4))}
+.lead{margin:0 0 1.4rem;color:var(--mut)}
+.ctrl{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.4rem}
+button{font:inherit;cursor:pointer;padding:.8rem 1.6rem;border-radius:14px;color:#fff;transition:transform .2s,box-shadow .2s}
+button:active{transform:scale(.96)}
+.primary{border:1px solid transparent;font-weight:700;background:linear-gradient(120deg,var(--accent),var(--accent2));box-shadow:0 0 24px rgba(124,92,255,.4)}
+.primary:hover{box-shadow:0 0 36px rgba(34,211,238,.6)}
+.ghost{background:transparent;border:1px solid var(--line)}
+.ghost:hover{border-color:var(--accent2)}
+.panel{padding:1.6rem;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--line);backdrop-filter:blur(8px);box-shadow:0 0 50px rgba(124,92,255,.15)}
+.stats{display:flex;gap:.8rem}
+.chip{padding:.6rem 1rem;border-radius:12px;background:rgba(255,255,255,.07);color:var(--mut);font-size:.9rem}
+.chip b{margin-left:.3rem;font-size:1.5rem;color:var(--fg)}
+.target{height:150px;display:flex;align-items:center;justify-content:center;font-size:6.5rem;font-weight:800;font-family:ui-monospace,Menlo,Consolas,monospace;
+color:var(--accent2);text-shadow:0 0 30px rgba(34,211,238,.7)}
+.target.idle{color:var(--mut);text-shadow:none}
+.target.shake{animation:shake .3s;color:var(--bad);text-shadow:0 0 30px rgba(255,107,138,.7)}
+.target.pop{animation:pop .3s}
+@keyframes shake{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+@keyframes pop{50%{transform:scale(1.25)}}
+.kb{margin:0 auto;padding:1.1rem;max-width:720px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.row{display:flex;gap:.4rem}
+.key{width:clamp(26px,7.4vw,48px);height:clamp(30px,8vw,48px);display:flex;align-items:center;justify-content:center;border-radius:9px;
+background:#1a2038;color:#cfd5f5;border:1px solid var(--line);box-shadow:0 3px 0 #0a0d1c;font-weight:600;font-size:clamp(.7rem,2.2vw,1rem);transition:all .15s}
+.key.home{background:#4a2f45;color:#ffd6e6}
+.key.on{background:linear-gradient(120deg,var(--accent),var(--accent2));color:#fff;transform:translateY(-3px);box-shadow:0 0 24px rgba(34,211,238,.9)}
+.msg{margin:1.2rem 0 0;text-align:center;min-height:1.6em;color:var(--mut)}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.note{margin:1.4rem 0 0;font-size:.85rem;color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" id="back" href="index.html">← 回開發歷程</a>
+  <div class="eyebrow">VERSION 03 · LEFT HAND</div>
+  <h1>英打遊戲版本 3</h1>
+  <p class="lead">把左手放在 A、S、D、F，按下亮起的按鍵。</p>
+  <div class="ctrl">
+    <button class="primary" id="start">開始 / 重新開始</button>
+    <button class="ghost" id="stop">停止練習</button>
+  </div>
+  <section class="panel">
+    <div class="stats">
+      <div class="chip">得分<b id="score">0</b></div>
+      <div class="chip">按錯<b id="wrong">0</b></div>
+    </div>
+    <div class="target idle" id="target">—</div>
+    <div class="kb" id="kb"></div>
+    <p class="msg" id="msg">按開始，再使用實體鍵盤作答。</p>
+  </section>
+  <p class="note">請切換英文輸入；大寫與小寫都接受。長按不連續計分，按錯保留原題。</p>
+</main>
+<script>
+const LETTERS=["A","S","D","F"], ROWS=["QWERTYUIOP","ASDFGHJKL;","ZXCVBNM"];
+const kb=document.getElementById("kb"), keys={};
+ROWS.forEach(r=>{const d=document.createElement("div");d.className="row";
+  for(const ch of r){const k=document.createElement("div");k.className="key"+(LETTERS.includes(ch)?" home":"");k.textContent=ch;keys[ch]=k;d.appendChild(k)}
+  kb.appendChild(d)});
+const $=id=>document.getElementById(id), tg=$("target"), msg=$("msg");
+let running=false,cur="",score=0,wrong=0;
+function say(t,c){msg.textContent=t;msg.className="msg "+(c||"")}
+function anim(c){tg.classList.remove("shake","pop");void tg.offsetWidth;tg.classList.add(c)}
+function next(){
+  if(keys[cur])keys[cur].classList.remove("on");
+  let n;do{n=LETTERS[Math.floor(Math.random()*LETTERS.length)]}while(n===cur&&LETTERS.length>1);
+  cur=n;tg.textContent=cur;tg.className="target";keys[cur].classList.add("on")}
+$("start").onclick=()=>{running=true;score=wrong=0;$("score").textContent=0;$("wrong").textContent=0;cur="";say("開始！按下亮起的字母。");next();$("start").blur()};
+$("stop").onclick=()=>{running=false;if(keys[cur])keys[cur].classList.remove("on");cur="";tg.textContent="—";tg.className="target idle";say("已停止練習。按開始可再來一次。");$("stop").blur()};
+addEventListener("keydown",e=>{
+  if(!running||e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.key.length!==1)return;
+  const k=e.key.toUpperCase();
+  if(k===cur){score++;$("score").textContent=score;say("答對！換下一個字母。","ok");next();anim("pop")}
+  else{wrong++;$("wrong").textContent=wrong;say("再試一次。","bad");anim("shake")}
+});
+// 回開發歷程的連結:若網址不同,請改這裡
+$("back").href="index.html";
+</script>
+</body>
+</html>
