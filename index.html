@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>英打遊戲開發歷程</title>
+<style>
+:root{--bg1:#0b0f1f;--bg2:#05060d;--fg:#e8ecff;--mut:#8f98c9;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.14);--accent:#7c5cff;--accent2:#22d3ee;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0%,var(--bg1),var(--bg2) 70%) fixed;color:var(--fg);
+font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:3rem 1.5rem}
+h1{margin:0 0 .8rem;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;letter-spacing:.06em;
+background:linear-gradient(120deg,var(--accent2),var(--accent) 55%,#ff6ec7);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 20px rgba(124,92,255,.4))}
+.eyebrow{font-size:.8rem;letter-spacing:.2em;color:var(--mut);margin-bottom:.4rem}
+.lead{margin:0 0 2rem;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.card{display:flex;flex-direction:column;padding:1.6rem;border-radius:22px;background:var(--card);border:1px solid var(--line);
+backdrop-filter:blur(8px);transition:transform .25s,box-shadow .25s,border-color .25s}
+.card:hover{transform:translateY(-6px);border-color:rgba(124,92,255,.6);box-shadow:0 12px 40px rgba(124,92,255,.25)}
+.tag{font-size:.8rem;letter-spacing:.15em;color:var(--mut)}
+.card h2{margin:1.4rem 0 1.2rem;font-size:1.5rem}
+.card p{flex:1;margin:0 0 1.6rem;line-height:1.9;color:#c5cbee}
+.btn{display:block;box-sizing:border-box;width:100%;padding:.95rem 1.2rem;border-radius:14px;font:inherit;text-align:left;text-decoration:none;border:1px solid var(--line)}
+.btn.off{background:rgba(255,255,255,.06);color:var(--mut);cursor:not-allowed}
+.btn.go{color:#fff;font-weight:700;text-align:center;border-color:transparent;background:linear-gradient(120deg,var(--accent),var(--accent2));box-shadow:0 0 24px rgba(124,92,255,.4)}
+.btn.go:hover{box-shadow:0 0 36px rgba(34,211,238,.6)}
+.btn.soon{background:linear-gradient(120deg,#2f6f5e,#44705f);color:#fff;border-color:transparent;cursor:default}
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">MY TYPING JOURNEY</div>
+  <h1>英打遊戲開發歷程</h1>
+  <p class="lead">從第一個頁面開始，記錄每一次完成的小進步。</p>
+  <div class="grid">
+    <section class="card">
+      <span class="tag">VERSION 01</span>
+      <h2>版本1</h2>
+      <p>一個標題、一個按鈕。我的第一次網站部署。</p>
+      <a class="btn off" id="v1">先設定網站網址</a>
+    </section>
+    <section class="card">
+      <span class="tag">VERSION 02</span>
+      <h2>版本2</h2>
+      <p>加入外部圖片與聲音，讓遊戲預告有了聲音。</p>
+      <a class="btn off" id="v2">先設定網站網址</a>
+    </section>
+    <section class="card">
+      <span class="tag">VERSION 03</span>
+      <h2>版本3</h2>
+      <p>左手 ASDF 打字練習。</p>
+      <a class="btn off" id="v3">先設定網站網址</a>
+    </section>
+    <section class="card">
+      <span class="tag">VERSION 04</span>
+      <h2>版本4</h2>
+      <p>十個按鍵，接住從天空落下的字母。</p>
+      <a class="btn off" id="v4">先設定網站網址</a>
+    </section>
+  </div>
+</main>
+<script>
+// 在這裡填入各版本的網址（版本3 預設連到同資料夾的 version3.html，有自己的網址可替換）
+// （例如 "https://你的帳號.github.io/typing-rain/v1/"）
+// 填好後，按鈕會自動變成可點擊的連結
+const URLS={v1:"https://qubie1022.github.io/typing-game-v1/",v2:"https://qubie1022.github.io/typing-game-v2/",v3:"version3.html",v4:"version4.html"};
+const LABELS={v1:"前往版本1",v2:"前往版本2",v3:"開始練習",v4:"開始練習"};
+for(const [id,url] of Object.entries(URLS)){
+  if(!url)continue;
+  const a=document.getElementById(id);
+  a.href=url;a.className="btn go";a.textContent=LABELS[id];
+}
+</script>
+</body>
+</html>

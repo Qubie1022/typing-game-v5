@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>英打遊戲版本 4</title>
+<style>
+:root{--bg1:#0b0f1f;--bg2:#05060d;--fg:#e8ecff;--mut:#8f98c9;--line:rgba(255,255,255,.14);--accent:#7c5cff;--accent2:#22d3ee;--ok:#34d399;--bad:#ff6b8a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0%,var(--bg1),var(--bg2) 70%) fixed;color:var(--fg);
+font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+a.back{color:var(--accent2);font-size:.95rem}
+.eyebrow{margin:1.2rem 0 .3rem;font-size:.8rem;letter-spacing:.2em;color:var(--mut)}
+h1{margin:0 0 .8rem;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;letter-spacing:.06em;
+background:linear-gradient(120deg,var(--accent2),var(--accent) 55%,#ff6ec7);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 20px rgba(124,92,255,.4))}
+.lead{margin:0 0 1.4rem;color:var(--mut)}
+.panel{padding:1.4rem;margin-bottom:1.4rem;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--line);backdrop-filter:blur(8px);box-shadow:0 0 50px rgba(124,92,255,.15)}
+.setrow{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap;margin:.7rem 0 .4rem}
+input[type=range]{flex:1 1 260px;max-width:420px;accent-color:var(--accent2);cursor:pointer}
+.chk{display:flex;gap:.5rem;align-items:center;cursor:pointer;color:#c5cbee;font-size:.95rem}
+.chk input{width:1.1rem;height:1.1rem;accent-color:var(--accent2);cursor:pointer}
+.hint{margin:0 0 1rem;font-size:.82rem;color:var(--mut)}
+.ctrl{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;padding:.8rem 1.6rem;border-radius:14px;color:#fff;transition:transform .2s,box-shadow .2s}
+button:active:not(:disabled){transform:scale(.96)}
+.primary{border:1px solid transparent;font-weight:700;background:linear-gradient(120deg,var(--accent),var(--accent2));box-shadow:0 0 24px rgba(124,92,255,.4)}
+.primary:hover{box-shadow:0 0 36px rgba(34,211,238,.6)}
+.ghost{background:transparent;border:1px solid var(--line)}
+.ghost:hover:not(:disabled){border-color:var(--accent2)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.stats{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem}
+.chip{padding:.6rem 1rem;border-radius:12px;background:rgba(255,255,255,.07);color:var(--mut);font-size:.9rem}
+.chip b{margin:0 .2rem 0 .3rem;font-size:1.5rem;color:var(--fg)}
+#field{position:relative;height:300px;overflow:hidden;border-radius:16px;border:1px solid var(--line);
+background:linear-gradient(#10173a,#07091a 75%,#0d1a2f)}
+#field::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 0 18px var(--accent2)}
+.fh{position:absolute;left:.8rem;top:.6rem;font-size:.78rem;color:var(--mut)}
+.drop{position:absolute;transform:translateX(-50%);font:800 2.8rem ui-monospace,Menlo,Consolas,monospace;color:var(--accent2);text-shadow:0 0 22px rgba(34,211,238,.8)}
+.drop.caught{color:var(--ok);text-shadow:0 0 30px var(--ok);animation:catch .35s forwards}
+.drop.land{color:var(--bad);text-shadow:0 0 24px var(--bad);animation:fade .35s forwards}
+@keyframes catch{to{transform:translateX(-50%) scale(2);opacity:0}}
+@keyframes fade{to{opacity:0}}
+.kb{margin:1.2rem auto 0;padding:1.1rem;max-width:720px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid var(--line);display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.row{display:flex;gap:.4rem}
+.key{width:clamp(26px,7.4vw,48px);height:clamp(30px,8vw,48px);display:flex;align-items:center;justify-content:center;border-radius:9px;
+background:#1a2038;color:#cfd5f5;border:1px solid var(--line);box-shadow:0 3px 0 #0a0d1c;font-weight:600;font-size:clamp(.7rem,2.2vw,1rem);transition:all .15s}
+.key.home{background:#4a2f45;color:#ffd6e6}
+.key.on{background:linear-gradient(120deg,var(--accent),var(--accent2));color:#fff;transform:translateY(-3px);box-shadow:0 0 24px rgba(34,211,238,.9)}
+.msg{margin:1.1rem 0 0;text-align:center;min-height:1.6em;color:var(--mut)}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.note{font-size:.85rem;color:var(--mut)}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" id="back" href="index.html">← 回開發歷程</a>
+  <div class="eyebrow">VERSION 04 · CATCH THE LETTERS</div>
+  <h1>英打遊戲版本 4</h1>
+  <p class="lead">在字母落地之前按對按鍵，練習 A S D F G H J K L ;。</p>
+
+  <section class="panel">
+    <label for="fall">每個字母落地時間：<span id="fallVal">8</span> 秒</label>
+    <div class="setrow">
+      <input type="range" id="fall" min="3" max="14" step="1" value="8">
+      <label class="chk"><input type="checkbox" id="accel">漸進加速：每答對三題縮短一秒，最快三秒</label>
+    </div>
+    <p class="hint">秒數越大，掉得越慢。初學可用 10～14 秒。</p>
+    <div class="ctrl">
+      <button class="primary" id="start">開始 / 重新開始</button>
+      <button class="ghost" id="pause" disabled>暫停</button>
+      <span>目前落地時間：<span id="curVal">8</span> 秒</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="stats">
+      <div class="chip">接住<b id="sCaught">0</b></div>
+      <div class="chip">落地<b id="sLand">0</b></div>
+      <div class="chip">按錯<b id="sWrong">0</b></div>
+      <div class="chip">完成<b id="sDone">0</b>/ 10</div>
+    </div>
+    <div id="field"><span class="fh">落地前，按下對應的英文字母</span></div>
+    <div class="kb" id="kb"></div>
+    <p class="msg" id="msg">按開始，用實體鍵盤接住字母；每次只出現一個。</p>
+  </section>
+  <p class="note">請切換英文輸入。按錯不消除目標；落地記錄一次，不扣生命。長按不連續消除。調整設定、切換分頁或離開視窗會暫停，按繼續恢復。</p>
+</main>
+<canvas id="fx"></canvas>
+<script>
+const KEYS="ASDFGHJKL;".split(""),ROWS=["QWERTYUIOP","ASDFGHJKL;","ZXCVBNM"],TOTAL=10;
+const $=id=>document.getElementById(id),field=$("field"),msg=$("msg"),slider=$("fall");
+const keys={};
+ROWS.forEach(r=>{const d=document.createElement("div");d.className="row";
+  for(const ch of r){const k=document.createElement("div");k.className="key"+(KEYS.includes(ch)?" home":"");k.textContent=ch;keys[ch]=k;d.appendChild(k)}
+  $("kb").appendChild(d)});
+
+let mode="idle",cur="",drop=null,elapsed=0,busy=false,round=0,last=null;
+let fall=+slider.value,caught=0,landed=0,wrong=0,streak=0;
+
+function say(t,c){msg.textContent=t;msg.className="msg "+(c||"")}
+function setFall(v){fall=v;slider.value=v;$("fallVal").textContent=v;$("curVal").textContent=v}
+function stats(){$("sCaught").textContent=caught;$("sLand").textContent=landed;$("sWrong").textContent=wrong;$("sDone").textContent=caught+landed}
+function clearKey(){if(keys[cur])keys[cur].classList.remove("on")}
+
+function spawn(){
+  if(drop)drop.remove();
+  clearKey();
+  let n;do{n=KEYS[Math.floor(Math.random()*KEYS.length)]}while(n===cur);
+  cur=n;elapsed=0;busy=false;
+  drop=document.createElement("div");drop.className="drop";drop.textContent=cur;
+  drop.style.left=(8+Math.random()*84)+"%";drop.style.top="0px";
+  field.appendChild(drop);keys[cur].classList.add("on");
+}
+function resolve(){
+  busy=true;stats();clearKey();
+  const r=round;
+  setTimeout(()=>{
+    if(r!==round)return;
+    if(caught+landed>=TOTAL)finish();else spawn();
+  },380);
+}
+function finish(){
+  mode="done";if(drop){drop.remove();drop=null}finale();
+  $("pause").disabled=true;$("pause").textContent="暫停";
+  say(`完成！接住 ${caught} 個，落地 ${landed} 個。按「開始 / 重新開始」再練一次。`,"ok");
+}
+function land(){
+  landed++;streak=0;drop.style.top=(field.clientHeight-drop.offsetHeight-6)+"px";drop.classList.add("land");say("落地了，下一個！","bad");resolve();
+}
+function hit(){
+  caught++;streak++;const rc=drop.getBoundingClientRect();burst(rc.left+rc.width/2,rc.top+rc.height/2,32);drop.classList.add("caught");say("接住了！","ok");
+  if($("accel").checked&&streak%3===0&&fall>3)setFall(fall-1);
+  resolve();
+}
+function pause(){
+  if(mode==="running"){mode="paused";$("pause").textContent="繼續";say("已暫停，按繼續恢復。")}
+  else if(mode==="paused"){mode="running";$("pause").textContent="暫停";say("繼續！在字母落地前按對鍵。")}
+}
+function autoPause(){if(mode==="running")pause()}
+
+$("start").onclick=()=>{
+  round++;caught=landed=wrong=streak=0;cur="";stats();
+  mode="running";$("pause").disabled=false;$("pause").textContent="暫停";
+  say("開始！在字母落地前按對鍵。");spawn();$("start").blur();
+};
+$("pause").onclick=()=>{pause();$("pause").blur()};
+slider.addEventListener("input",()=>{
+  const v=+slider.value;
+  if(drop&&!busy)elapsed=elapsed*v/fall; // 保持字母目前的相對高度
+  setFall(v);autoPause();
+});
+$("accel").addEventListener("change",autoPause);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)autoPause()});
+addEventListener("blur",autoPause);
+
+addEventListener("keydown",e=>{
+  if(mode!=="running"||busy||e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.key.length!==1||e.key===" ")return;
+  if(e.key.toUpperCase()===cur)hit();
+  else{wrong++;stats();say("再試一次。","bad")}
+});
+
+// ===== 煙火 =====
+const fx=$("fx"),fc=fx.getContext("2d"),parts=[],COLORS=["#22d3ee","#7c5cff","#ff6ec7","#34d399","#fbbf24","#fff"];
+function fxSize(){fx.width=innerWidth;fx.height=innerHeight}
+addEventListener("resize",fxSize);fxSize();
+function burst(x,y,n){
+  const c=COLORS[Math.floor(Math.random()*COLORS.length)];
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,v=60+Math.random()*(n>40?260:170);
+    parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:0,max:.7+Math.random()*.6,c:Math.random()<.7?c:COLORS[Math.floor(Math.random()*COLORS.length)]});
+  }
+}
+function drawFx(dt){
+  fc.clearRect(0,0,fx.width,fx.height);
+  fc.globalCompositeOperation="lighter";
+  for(let i=parts.length-1;i>=0;i--){
+    const q=parts[i];q.life+=dt;
+    if(q.life>=q.max){parts.splice(i,1);continue}
+    q.vy+=240*dt;q.vx*=.985;q.x+=q.vx*dt;q.y+=q.vy*dt;
+    fc.globalAlpha=1-q.life/q.max;fc.fillStyle=q.c;
+    fc.beginPath();fc.arc(q.x,q.y,2.4,0,Math.PI*2);fc.fill();
+  }
+  fc.globalAlpha=1;
+}
+function finale(){
+  for(let i=0;i<6;i++)setTimeout(()=>burst(innerWidth*(.15+Math.random()*.7),innerHeight*(.15+Math.random()*.4),70),i*260);
+}
+
+function frame(ts){
+  if(last===null)last=ts;
+  const dt=Math.min((ts-last)/1000,.1);last=ts;drawFx(dt);
+  if(mode==="running"&&drop&&!busy){
+    elapsed+=dt;
+    if(elapsed>=fall)land();
+    else drop.style.top=(elapsed/fall)*(field.clientHeight-drop.offsetHeight-6)+"px";
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+$("back").href="index.html";
+</script>
+</body>
+</html>
